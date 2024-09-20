@@ -5,9 +5,7 @@ The full package includes the main Python script, an example file, and a user gu
 
 The user guide contains detailed instructions on creating the CSV file and running TROPIC.
 
-Please cite the following paper if TROPIC is used: TBD
-
-Link to repository: TBD
+Computer Physics Communications publication: https://doi.org/10.1016/j.cpc.2024.109383
 
 # File list
 TROPIC.py: The main file to be executed with Python 3 via the command-line
