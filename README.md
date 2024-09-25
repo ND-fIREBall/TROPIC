@@ -7,6 +7,8 @@ The user guide contains detailed instructions on creating the CSV file and runni
 
 Please cite the following publication when citing TROPIC: https://doi.org/10.1016/j.cpc.2024.109383
 
+Please address any feedback to Kevin Lee (klee16@nd.edu)
+
 # File list
 TROPIC.py: The main file to be executed with Python 3 via the command-line
 
