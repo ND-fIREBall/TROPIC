@@ -201,10 +201,11 @@ def B_coefficients(pi_l):
     consolidated coefficient for final B(pl) calculation (float)    
     """
     l=get_L(pi_l)
-    if pi_l=='E1' and see_weisskopf_units.upper() == 'Y':
-        return np.double(hbar/(8*m.pi)*mult_coefficient(pi_l)*hc**(1+2*l)*1000)
-    else:
-        return np.double(hbar/(8*m.pi)*mult_coefficient(pi_l)*hc**(1+2*l))
+    #if pi_l=='E1' and see_weisskopf_units.upper() == 'Y':
+    #    return np.double(hbar/(8*m.pi)*mult_coefficient(pi_l)*hc**(1+2*l)*1000)
+    #else:
+    #    return np.double(hbar/(8*m.pi)*mult_coefficient(pi_l)*hc**(1+2*l))
+    return np.double(hbar/(8*m.pi)*mult_coefficient(pi_l)*hc**(1+2*l))
 
 def units(A,pi_l):
     """Final unit conversion (if necessary) of B(pl) calculation
@@ -235,8 +236,8 @@ def latex_friendly_units(pi_l, delta):
     """
     # Assume Weisskopf units, switch to cgs if indicated by input
     unit = 'W.u.'
-    if pi_l == 'E1':
-        unit = 'mW.u.'
+    #if pi_l == 'E1':
+    #    unit = 'mW.u.'
     if see_weisskopf_units.upper() == 'N':
         l=get_L(pi_l)
         if pi_l[0]=='E':
@@ -482,20 +483,26 @@ def write_line(paramdict):
     # Calculate B(pi*l) value
     bvalue = B(paramdict)
     # Write A, E(level), tau, E(gamma), Intensity, alpha, multipolarity in latex syntax 
-    lineMassNumber=str(paramdict['A_out']).ljust(4,' ')+' & '
-    lineTau=(str(paramdict['tau'])+'$^{+'+str(paramdict['tau_errors'][0])+'}_{-'+str(paramdict['tau_errors'][1])+'}$ ').ljust(20,' ') + ' & '
+    lineMassNumber = str(paramdict['A_out']).ljust(4,' ')+' & '
+    lineTau = (str(paramdict['tau'])+'$^{+'+str(paramdict['tau_errors'][0])+'}_{-'+str(paramdict['tau_errors'][1])+'}$ ').ljust(20,' ') + ' & '
     if paramdict['tau_errors'][0] == paramdict['tau_errors'][1]:
         lineTau = shorthand_error(paramdict['tau'],paramdict['tau_errors'][0]).ljust(15,' ') + ' & '        
     if paramdict['tau_out'] == '':
         lineTau = ' & '  
     lineEnergy=str(paramdict['E_lev_out']).ljust(15,' ')+' & '+ lineTau +shorthand_error(paramdict['E_g'],paramdict['E_g_error']).ljust(15,' ')+' & '+str(round(paramdict['E_lev']-paramdict['E_g'],2)).ljust(15,' ')+' & '   
-    lineIntandICC=shorthand_error(paramdict['I_g'],paramdict['I_g_error']).ljust(15,' ')+' & '+ shorthand_error(paramdict['ICC'],paramdict['ICC_error']).ljust(15,' ') + ' & ' 
-    lineMultipolarity=str(label).ljust(10,' ')+' & '
+    lineIntandICC = shorthand_error(paramdict['I_g'],paramdict['I_g_error']).ljust(15,' ')+' & '+ shorthand_error(paramdict['ICC'],paramdict['ICC_error']).ljust(15,' ') + ' & ' 
+    lineMultipolarity = str(label).ljust(10,' ')+' & '
+    labelordelta = label
     uncertainties = [0,0]
     # If the error is above a certain threshold for any of the parameters, get uncertainties by using upper/lower bounds of each parameter to obtain upper/lower bound of the transition
     errorpercent = [paramdict['E_g_error']/paramdict['E_g'],paramdict['I_g_error']/paramdict['I_g'],paramdict['tau_errors'][0]/paramdict['tau'],paramdict['tau_errors'][1]/paramdict['tau']]
     if paramdict['delta'] != 0:
         errorpercent.extend([paramdict['delta_errors'][0]/paramdict['delta'],paramdict['delta_errors'][1]/paramdict['delta']])
+        labelordelta = str(paramdict['delta'])
+        if paramdict['delta_errors'][0] == paramdict['delta_errors'][1]:
+            lineMultipolarity = shorthand_error(paramdict['delta'],paramdict['delta_errors'][0]).ljust(15,' ') + ' & '
+        else:
+            lineMultipolarity = (str(paramdict['delta'])+'$^{+'+str(paramdict['delta_errors'][0])+'}_{-'+str(paramdict['delta_errors'][1])+'}$ ').ljust(20,' ') + ' & '
     # Check if the errors of the other parameters are above the error threshold
     if paramdict['minmaxflag'] == 'false':
         for unc in errorpercent:
@@ -537,9 +544,9 @@ def write_line(paramdict):
     lineMult=(bvalue+'$^{+'+uncertainties[0]+'}_{-'+uncertainties[1]+'}$ '+latex_friendly_units(paramdict['pi_l'],paramdict['delta'])).ljust(30,' ')+' \\\\ \n'
     latex_output.write(lineMassNumber+lineEnergy+lineIntandICC+lineMultipolarity+lineMult)
     # CSV file
-    csv_output.write(','.join([str(paramdict['A_out']),str(paramdict['E_lev_out']),str(paramdict['tau_out']),str(paramdict['E_g']),str(round(paramdict['E_lev']-paramdict['E_g'],2)),str(paramdict['I_g']),str(paramdict['ICC']),label,bvalue,uncertainties[0],uncertainties[1],latex_friendly_units(paramdict['pi_l'],paramdict['delta']).translate(str.maketrans({'$': '', '\\': ''})),'\n']))
+    csv_output.write(','.join([str(paramdict['A_out']),str(paramdict['E_lev_out']),str(paramdict['tau_out']),str(paramdict['E_g']),str(round(paramdict['E_lev']-paramdict['E_g'],2)),str(paramdict['I_g']),str(paramdict['ICC']),labelordelta,bvalue,uncertainties[0],uncertainties[1],latex_friendly_units(paramdict['pi_l'],paramdict['delta']).translate(str.maketrans({'$': '', '\\': ''})),'\n']))
     # Terminal 
-    print(shorthand_error(paramdict['E_g'],paramdict['E_g_error']),'|',round(paramdict['E_lev']-paramdict['E_g'],2),'|',shorthand_error(paramdict['I_g'],paramdict['I_g_error']),'|',shorthand_error(paramdict['ICC'],paramdict['ICC_error']),'|', label, '|', bvalue,'+/-','('+uncertainties[0]+', '+uncertainties[1]+')',latex_friendly_units(paramdict['pi_l'],paramdict['delta']).translate(str.maketrans({'$': '', '\\': ''})),'\n')
+    print(shorthand_error(paramdict['E_g'],paramdict['E_g_error']),'|',round(paramdict['E_lev']-paramdict['E_g'],2),'|',shorthand_error(paramdict['I_g'],paramdict['I_g_error']),'|',shorthand_error(paramdict['ICC'],paramdict['ICC_error']),'|', labelordelta, '|', bvalue,'+/-','('+uncertainties[0]+', '+uncertainties[1]+')',latex_friendly_units(paramdict['pi_l'],paramdict['delta']).translate(str.maketrans({'$': '', '\\': ''})),'\n')
     return
   
 # LaTeX Table header
