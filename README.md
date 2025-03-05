@@ -16,4 +16,4 @@ TROPIC_User_Guide: A short user guide detailing how to use TROPIC
 
 168Er_example.csv: An example input file containing some transitions from 168Er
 
-172Yb_example.csv: An example input file containing some transitions from 172Er
+172Yb_example.csv: An example input file containing some transitions from 172Yb
